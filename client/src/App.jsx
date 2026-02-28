@@ -15,7 +15,7 @@ const App = () => {
         <Route path='/' element={<Home />} />
         
         <Route path='app' element={<Layout />}>
-          <Route index element={<Dashboard />} />
+          <Route index element={<Dashboard />} /> {/*default child route for /app*/}
           <Route path='builder/:resumeId' element={<ResumeBuilder />} />
         </Route>
 
@@ -29,3 +29,9 @@ const App = () => {
 }
 
 export default App
+
+
+/* The index element is the default child route that renders when you visit the parent path exactly. So in this case:
+ /app → shows Layout + Dashboard (the indexed child)
+ /app/builder/123 → shows Layout + ResumeBuilder 
+*/
