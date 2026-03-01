@@ -96,7 +96,7 @@ const Hero = () => {
             </a>
             <button onClick={closeNavbar}
                 className="border border-slate-600 hover:bg-slate-800 px-4 py-2 rounded-full text-sm font-medium transition">
-                Contact
+                Login
             </button>
             <button onClick={closeNavbar}
                 className="bg-white hover:shadow-[0px_0px_30px_14px] shadow-[0px_0px_30px_7px] hover:shadow-white/50 shadow-white/50 text-black px-4 py-2 rounded-full text-sm font-medium hover:bg-slate-100 transition duration-300">
@@ -130,12 +130,12 @@ const Hero = () => {
                 Get Started
             </button>
         </Link>
-        <button className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-6 py-3">
+        <Link to="#"><button className="flex items-center gap-2 bg-white/10 border border-white/15 rounded-full px-6 py-3">
             <span>Learn More</span>
             <svg className="mt-0.5" width="6" height="8" viewBox="0 0 6 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1.25.5 4.75 4l-3.5 3.5" stroke="currentColor" strokeOpacity=".4" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-        </button>
+        </button></Link>
     </div>
     <div className="flex items-center mt-8">
         <div className="flex -space-x-3 pr-3">
