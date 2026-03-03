@@ -1,7 +1,10 @@
 import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
-    const [state, setState] = useState("login")
+    const query = new URLSearchParams(window.location.search)
+    const urlstate = query.get("state")
+    const [state, setState] = useState(urlstate || "login")
 
     const [formData, setFormData] = useState({
         name: '',
@@ -61,7 +64,16 @@ const Login = () => {
             </div>
         
             {/* Right side: Form alignment centrally */}
-            <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 relative z-10">
+            <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 relative z-10 w-full">
+                
+                {/* Back Link / Arrow to return Home */}
+                <Link to="/" className="absolute top-6 right-6 sm:top-8 sm:right-8 lg:top-12 lg:right-12 text-slate-400 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </Link>
+
                 <form onSubmit={handleSubmit} className="w-full max-w-md flex flex-col justify-center">
                     <h2 className="text-3xl sm:text-4xl text-white font-medium mb-3 text-center sm:text-left">
                         {state === "login" ? "Sign in" : "Sign up"}
