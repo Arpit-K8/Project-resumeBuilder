@@ -9,9 +9,9 @@
     @apply cursor-pointer;
   }
   input:not([type="checkbox"]) {
-    @apply outline-none focus-ring border border-gray-300 focus:ring-blue-50 focus:border-blue-500 rounded-lg;
+    @apply outline-none focus:ring-2 border border-gray-300 focus:ring-indigo-300 focus:border-indigo-500 rounded-lg;
   }
-  text-area {
-    @apply outline-none focus-ring border border-gray-300 focus:ring-blue-50 focus:border-blue-500 rounded-lg resize-none;
+  textarea {
+    @apply outline-none focus:ring-2 border border-gray-300 focus:ring-indigo-300 focus:border-indigo-500 rounded-lg resize-none;
   }
 }
