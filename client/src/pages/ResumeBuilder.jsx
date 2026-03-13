@@ -10,6 +10,8 @@ import ColorPicker from '../components/ColorPicker';
 import ProfessionalSummaryForm from '../components/ProfessionalSummaryForm';
 import ExperienceForm from '../components/ExperienceForm';
 import EducationForm from '../components/EducationForm';
+import ProjectForm from '../components/ProjectForm';
+import SkillForm from '../components/SkillForm';
 
 const ResumeBuilder = () => {
   const { resumeId } = useParams();
@@ -31,7 +33,11 @@ const ResumeBuilder = () => {
   const loadExistingResume = async() =>{
     const resume = dummyResumeData.find(resume => resume._id === resumeId);
     if(resume){
-      setResumeData(resume);
+      const normalizedProjects = resume.project ?? [];
+      setResumeData({
+        ...resume,
+        project: normalizedProjects,
+      });
       document.title = resume.title ;
     }
   }
@@ -68,7 +74,7 @@ const ResumeBuilder = () => {
             <div className='relative lg:col-span-5 rounded-lg overflow-hidden border border-slate-300'>
               <div className='bg-whte rounded-lg shadow-sm border border-gray-200 p-6 pt-1'>
                 <hr className='absolute top-0 left-0 right-0 border-2 border-gray-200' />
-                <hr className='absolute top-0 left-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 border-none transition-all duration-2000 ' style={{width: `${activeSectionIndex * 100 / (sections.length-1)}%`}} />
+                <hr className='absolute top-0 left-0 h-1 bg-linear-to-r from-blue-500 to-blue-600 border-none transition-all duration-2000 ' style={{width: `${activeSectionIndex * 100 / (sections.length-1)}%`}} />
               
                 {/* section navigation */}
                 <div className='flex justify-between items-center mb-6 border-b border-gray-300 py-1'>
@@ -115,7 +121,22 @@ const ResumeBuilder = () => {
                         <EducationForm data={resumeData.education} 
                         onChange={(data) => setResumeData(prev => ({...prev, education: data}))}
                         />
+                      )} 
+
+                      {ActiveSection.id === 'projects' && (
+                        <ProjectForm data={resumeData.project} 
+                        onChange={(data) => setResumeData(prev => ({...prev, project: data}))}
+                        />
+                      )}
+
+                      {ActiveSection.id === 'skills' && (
+                        <SkillForm data={resumeData.skills} onChange={(data) => setResumeData(prev => ({...prev, skills: data}))}/>
                       )}                      
+                </div>
+                <div className='mt-6 flex justify-start'>
+                  <button className='inline-flex items-center justify-center rounded-md bg-linear-to-br from-indigo-100 to-indigo-200 px-6 py-2 text-sm font-medium text-indigo-600 ring ring-indigo-300 transition-all hover:ring-indigo-400'>
+                    Save Changes
+                  </button>
                 </div>
               </div>
             </div>

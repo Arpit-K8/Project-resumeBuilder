@@ -3,7 +3,7 @@ import { GraduationCap, Plus, Trash2 } from 'lucide-react';
 
 const EducationForm = ({data, onChange}) => {
   
-      const addEducation = () => {
+    const addEducation = () => {
         const newEducation = {
             // id: Date.now(),
             institution: "",
