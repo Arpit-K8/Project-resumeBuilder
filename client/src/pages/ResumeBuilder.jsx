@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom';
 import { dummyResumeData } from '../assets/assets';
-import { ArrowLeftIcon,User,FileText,Briefcase,GraduationCap,FolderIcon, Sparkles, ChevronRight, ChevronLeft
+import { ArrowLeftIcon,User,FileText,Briefcase,GraduationCap,FolderIcon, Sparkles, ChevronRight, ChevronLeft, Share2Icon, EyeIcon, EyeOffIcon, DownloadIcon
  } from 'lucide-react';
 import PersonalInfoForm from '../components/PersonalInfoForm';
 import ResumePreview from '../components/ResumePreview';
@@ -59,6 +59,34 @@ const ResumeBuilder = () => {
   useEffect(()=>{
     loadExistingResume();
   }, [])
+
+  const changeResumeVisibility = () => {
+    setResumeData({...resumeData, public: !resumeData.public});
+  }
+  const handleShare = () => {
+    const frontenedUrl = window.location.href.split("/app")[0];
+    const resumeUrl = frontenedUrl + "/view/" + resumeId;
+    if(navigator.share){
+      navigator.share({
+        url: resumeUrl,
+        text: "Check out my resume!"
+      })
+    } else{
+      alert("Share not supported on this browser");
+    }
+
+    const downloadResume = () => {
+      window.print();
+    }
+
+    if(!resumeData.public){
+      changeResumeVisibility();
+    }
+  }
+
+  const downloadResume = () => {
+    window.print();
+  }
 
   return (
     <div>
@@ -143,8 +171,27 @@ const ResumeBuilder = () => {
             
             {/* right panel for resume preview */}
             <div className="lg:col-span-7 max-lg:mt-6">
-                  <div>  
-                      {/*button*/}
+                  <div className='relative w-full'>  
+                      <div className='absolute bottom-3 left-0 right-0 flex items-center justify-end gap-2'>
+                          {resumeData.public && (
+                            <button 
+                            onClick={handleShare}
+                            className='flex items-center p-2 px-4 gap-2 bg-linear-to-br from-green-100 to-green-200 text-green-600 rounded-lg ring-green-300 hover:ring transition-colors'>
+                              <Share2Icon className='size-4'/> Share
+                            </button>
+                          )}
+                            <button 
+                            onClick={changeResumeVisibility}
+                            className="flex items-center p-2 px-4 gap-2 bg-linear-to-br from-gray-100 to-gray-200 text-gray-600 rounded-lg ring-gray-300 hover:ring transition-colors">
+                              {resumeData.public ? <EyeIcon className='size-4'/> : <EyeOffIcon className='size-4'/>}
+                              {resumeData.public ? "Public" : "Private"} 
+                            </button>
+                            <button 
+                            onClick={downloadResume}
+                            className='flex items-center p-2 px-4 gap-2   bg-linear-to-br from-blue-100 to-blue-200 text-blue-600 rounded-lg ring-blue-300 hover:ring transition-colors'>
+                              <DownloadIcon className='size-4'/> Download
+                            </button>
+                      </div>
                   </div>
               <ResumePreview data={resumeData} template={resumeData.template} accentColor={resumeData.accent_color}/>
             </div>
@@ -155,5 +202,4 @@ const ResumeBuilder = () => {
     </div>
   )
 }
-
-export default ResumeBuilder
+export default ResumeBuilder;
