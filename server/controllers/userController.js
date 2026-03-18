@@ -3,6 +3,13 @@ import bycrpt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import Resume from "../models/Resume.js";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/;
+const PASSWORD_REGEX = /^(?=\S{8,64}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/;
+
+const normalizeEmail = (email = '') => email.trim().toLowerCase();
+const normalizeName = (name = '') => name.trim().replace(/\s+/g, ' ');
+
 const generateToken = (userId) => {
     const token = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return token;
@@ -12,11 +19,28 @@ const generateToken = (userId) => {
 //POST: /api/users/register
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const name = normalizeName(`${req.body?.name ?? ''}`);
+    const email = normalizeEmail(`${req.body?.email ?? ''}`);
+    const password = `${req.body?.password ?? ''}`;
+
     // Validate input
-        if (!name || !email || !password) {
-        return res.status(400).json({ message: 'Missing required fields' });
-        }
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    if (!NAME_REGEX.test(name) || name.length < 2 || name.length > 50) {
+      return res.status(400).json({ message: 'Name must be 2-50 characters and contain letters only' });
+    }
+
+    if (!EMAIL_REGEX.test(email) || email.length > 254) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      return res.status(400).json({
+        message: 'Password must be 8-64 chars with uppercase, lowercase, number, and special character'
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -50,11 +74,16 @@ export const registerUser = async (req, res) => {
 //POST: /api/users/login
 export const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = normalizeEmail(`${req.body?.email ?? ''}`);
+    const password = `${req.body?.password ?? ''}`;
 
     // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address' });
     }
 
     // Check if user exists

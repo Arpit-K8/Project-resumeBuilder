@@ -5,6 +5,10 @@ import { login } from '../app/features/authSlice'
 import api from '../configs/api'
 import { toast } from 'react-hot-toast'
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const NAME_REGEX = /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/
+const STRONG_PASSWORD_REGEX = /^(?=\S{8,64}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+$/
+
 const Login = () => {
     const query = new URLSearchParams(window.location.search)
     const urlstate = query.get("state")
@@ -15,15 +19,59 @@ const Login = () => {
         email: '',
         password: ''
     })
+    const [errors, setErrors] = useState({})
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
 
     const dispatch = useDispatch()
 
+    const validateForm = () => {
+        const validationErrors = {}
+        const name = formData.name.trim().replace(/\s+/g, ' ')
+        const email = formData.email.trim().toLowerCase()
+        const password = formData.password
+
+        if (state === 'signup') {
+            if (!name) {
+                validationErrors.name = 'Name is required'
+            } else if (name.length < 2 || name.length > 50 || !NAME_REGEX.test(name)) {
+                validationErrors.name = 'Name must be 2-50 letters only'
+            }
+        }
+
+        if (!email) {
+            validationErrors.email = 'Email is required'
+        } else if (email.length > 254 || !EMAIL_REGEX.test(email)) {
+            validationErrors.email = 'Enter a valid email address'
+        }
+
+        if (!password) {
+            validationErrors.password = 'Password is required'
+        } else if (state === 'signup' && !STRONG_PASSWORD_REGEX.test(password)) {
+            validationErrors.password = 'Use 8-64 chars with upper, lower, number, special char'
+        }
+
+        setErrors(validationErrors)
+        return Object.keys(validationErrors).length === 0
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (!validateForm()) return
+
+        setIsSubmitting(true)
         try {
+            const payload = {
+                name: formData.name.trim().replace(/\s+/g, ' '),
+                email: formData.email.trim().toLowerCase(),
+                password: formData.password
+            }
             const endpoint = state === 'login' ? 'login' : 'register';
-            const {data} = await api.post(`/api/users/${endpoint}`, formData)
+            const requestBody = state === 'login'
+                ? { email: payload.email, password: payload.password }
+                : payload
+
+            const {data} = await api.post(`/api/users/${endpoint}`, requestBody)
             console.log("Login successful:", data)
             dispatch(login({user: data.user, token: data.token}))
             localStorage.setItem('token', data.token);
@@ -31,6 +79,8 @@ const Login = () => {
         } catch (error) {
             console.error("Error submitting form:", error)
             toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setIsSubmitting(false)
         }
 
         console.log("Submitting:", state, formData)
@@ -38,6 +88,9 @@ const Login = () => {
 
     const handleChange = (e) => {
         const { name, value } = e.target
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: '' }))
+        }
         setFormData(prev => ({ ...prev, [name]: value }))
     }
 
@@ -82,7 +135,7 @@ const Login = () => {
             </div>
         
             {/* Right side: Form alignment centrally */}
-            <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 relative z-10 w-full">
+            <div className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-12 relative z-10">
                 
                 {/* Back Link / Arrow to return Home */}
                 <Link to="/" className="absolute top-6 right-6 sm:top-8 sm:right-8 lg:top-12 lg:right-12 text-slate-400 hover:text-white transition-colors p-2 bg-white/5 hover:bg-white/10 rounded-full flex items-center justify-center">
@@ -116,27 +169,31 @@ const Login = () => {
                     </div>
 
                     {state === "signup" && (
-                        <div className="flex items-center w-full mb-5 bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
-                            </svg>
-                            <input onChange={handleChange} value={formData.name} name="name" type="text" placeholder="Full name" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required />                 
-                        </div>
+                        <>
+                            <div className="flex items-center w-full mb-2 bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <input onChange={handleChange} value={formData.name} name="name" type="text" placeholder="Full name" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required maxLength={50} minLength={2} />
+                            </div>
+                            {errors.name && <p className="text-xs text-red-400 mb-3">{errors.name}</p>}
+                        </>
                     )}
         
                     <div className="flex items-center w-full bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3">
                         <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" clipRule="evenodd" d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z" fill="#9CA3AF"/>
                         </svg>
-                        <input onChange={handleChange} value={formData.email} name="email" type="email" placeholder="Email id" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required />                 
+                        <input onChange={handleChange} value={formData.email} name="email" type="email" placeholder="Email id" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required maxLength={254} />
                     </div>
+                    {errors.email && <p className="text-xs text-red-400 mt-2">{errors.email}</p>}
         
                     <div className="flex items-center mt-5 w-full bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3 relative">
                         <svg width="13" height="17" viewBox="0 0 13 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z" fill="#9CA3AF"/>
                         </svg>
-                        <input onChange={handleChange} value={formData.password} name="password" type={showPassword ? "text" : "password"} placeholder="Password" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full pr-10" required />
+                        <input onChange={handleChange} value={formData.password} name="password" type={showPassword ? "text" : "password"} placeholder="Password" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full pr-10" required minLength={8} maxLength={64} />
                         <button 
                             type="button" 
                             onClick={() => setShowPassword(!showPassword)}
@@ -156,6 +213,7 @@ const Login = () => {
                             )}
                         </button>
                     </div>
+                    {errors.password && <p className="text-xs text-red-400 mt-2">{errors.password}</p>}
         
                     {state === "login" && (
                         <div className="w-full flex items-center justify-between mt-6 text-slate-400">
@@ -167,8 +225,8 @@ const Login = () => {
                         </div>
                     )}
         
-                    <button type="submit" className="mt-8 w-full h-11 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 font-medium transition-all shadow-lg shadow-indigo-600/20 active:scale-[0.98]">
-                        {state === "login" ? "Login" : "Sign up"}
+                    <button disabled={isSubmitting} type="submit" className="mt-8 w-full h-11 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-70 disabled:cursor-not-allowed font-medium transition-all shadow-lg shadow-indigo-600/20 active:scale-[0.98]">
+                        {isSubmitting ? 'Please wait...' : (state === "login" ? "Login" : "Sign up")}
                     </button>
                     
                     {state === "login" ? (
