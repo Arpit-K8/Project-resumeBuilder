@@ -68,16 +68,26 @@ const MinimalTemplate = ({ data, accentColor }) => {
             )}
 
             {/* Projects */}
-            {data.project && data.project.length > 0 && (
+            {data.projects && data.projects.length > 0 && (
                 <section className="mb-10">
                     <h2 className="text-sm uppercase tracking-widest mb-6 font-medium" style={{ color: accentColor }}>
                         Projects
                     </h2>
 
                     <div className="space-y-4">
-                        {data.project.map((proj, index) => (
+                        {data.projects.map((proj, index) => (
                             <div key={index} className="flex flex-col gap-2 justify-between items-baseline">
                                 <h3 className="text-lg font-medium ">{proj.name}</h3>
+                                {proj.type && <p className="text-sm" style={{ color: accentColor }}>{proj.type}</p>}
+                                {(proj.end_date || proj.is_current) && (
+                                    <p className="text-xs text-gray-500">{proj.is_current ? "Present" : formatDate(proj.end_date)}</p>
+                                )}
+                                {proj.tech_stack && <p className="text-sm text-gray-600">Tech: {proj.tech_stack}</p>}
+                                {proj.project_link && (
+                                    <a href={proj.project_link} target="_blank" rel="noreferrer" className="text-sm underline" style={{ color: accentColor }}>
+                                        Repo Link
+                                    </a>
+                                )}
                                 <p className="text-gray-600">{proj.description}</p>
                             </div>
                         ))}
@@ -103,7 +113,7 @@ const MinimalTemplate = ({ data, accentColor }) => {
                                     {edu.gpa && <p className="text-sm text-gray-500">GPA: {edu.gpa}</p>}
                                 </div>
                                 <span className="text-sm text-gray-500">
-                                    {formatDate(edu.graduation_date)}
+                                    {edu.is_current ? "Present" : formatDate(edu.graduation_date)}
                                 </span>
                             </div>
                         ))}

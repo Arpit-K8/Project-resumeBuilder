@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 import {
   XIcon,
   FilePenLineIcon,
@@ -10,13 +11,18 @@ import {
   Clock3Icon,
   SparklesIcon,
   CheckCircle2Icon,
+  LoaderCircleIcon,
+  UserIcon,
 } from 'lucide-react'
-import { dummyResumeData } from '../assets/assets'
 import { useNavigate } from 'react-router-dom'
-import dummy_profile from '../assets/dummy_profile.png'
 import DashboardFooter from '../components/DashboardFooter'
+import api from '../configs/api'
+import { toast } from 'react-hot-toast'
+import pdfToText from 'react-pdftotext'
 
 const Dashboard = () => {
+  const {token} = useSelector(state => state.auth)
+
   const colors = ["#4f46e5", "#0ea5e9", "#7c3aed", "#14b8a6"];
   const [allResumes, setAllResumes] = useState([])
 
@@ -27,38 +33,100 @@ const Dashboard = () => {
   const [resume, setResume] = useState(null)
   const [editResumeId, setEditResumeId] = useState('')
 
+  const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate();
   
   const editTitle = async(event) =>{
-    event.preventDefault();
-    // setEditResumeId('');
-    // setTitle('');
+    try {
+      event.preventDefault();
+      const {data} = await api.put(`/api/resumes/update`,{resumeId: editResumeId, resumeData: {title}}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAllResumes(allResumes.map(resume => resume._id === editResumeId ? {...resume, title} : resume))
+      setTitle('');
+      setEditResumeId('');
+      toast.success(data.message)
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || 'Failed to edit resume');
+      console.log(error.message);
+    }
   }
   const deleteResume = async(resumeId) =>{
-    const confirm  = window.confirm('Are you sure you want to delete this resume?');
-    if(confirm){
-      // api call to delete resume
-      setAllResumes(prev => prev.filter(resume => resume._id !== resumeId))
+    try {
+      const confirm  = window.confirm('Are you sure you want to delete this resume?');
+      if(confirm){
+          const {data} = await api.delete(`/api/resumes/delete/${resumeId}`,{
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setAllResumes(allResumes.filter(resume => resume._id !== resumeId))
+        toast.success(data.message)
+      }
+    } catch (error) {
+       toast.error(error?.response?.data?.message || error.message || 'Failed to delete resume');
+      console.log(error.message);
     }
-
   }
 
   const createResume = async(event) =>{
-    event.preventDefault();
-    setShowCreateResume(false);
-    navigate('/app/builder/res123')
+    try {
+      event.preventDefault();
+      const {data} = await api.post('/api/resumes/create', {title}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setAllResumes([...allResumes, data.resume ]);
+      setTitle('');
+      setShowCreateResume(false);
+      if (data && data.resume && data.resume._id) {
+          navigate(`/app/builder/${data.resume._id}`)
+      }
+
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || 'Failed to create resume');
+      console.log(error.message)
+    }
   }
 
   const uploadResume = async(event) =>{
     event.preventDefault();
-    setTitle('');
-    setResume(null);
-    setShowUploadResume(false);
-    navigate('/app/builder/res123')
+    setIsLoading(true);
+    try {
+      const resumeText = await pdfToText(resume);
+      const {data} = await api.post('/api/ai/upload-resume', { title, resumeText }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setTitle('');
+      setResume(null);
+      setShowUploadResume(false);
+      if (data && data.resume && data.resume._id) {
+          navigate(`/app/builder/${data.resume._id}`)
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || 'Failed to upload resume');
+      console.log(error.message)
+    }
+    setIsLoading(false);
   }
   
   const loadAllResumes = async () => {
-    setAllResumes(dummyResumeData);
+    try {
+      const {data} = await api.get('/api/users/resumes', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setAllResumes(data.resumes);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error.message || 'Failed to load resumes');
+      console.log(error.message);
+    }
   }
 
   useEffect(() => {
@@ -66,6 +134,7 @@ const Dashboard = () => {
   }, []);
 
   const lastUpdatedResume = allResumes[0];
+  const lastProfileImage = lastUpdatedResume?.personal_info?.image;
 
   return (
     <div className='min-h-screen bg-linear-to-br from-slate-50 via-indigo-50/40 to-sky-50 flex flex-col'>
@@ -148,7 +217,13 @@ const Dashboard = () => {
                 </div>
 
                 <div className='rounded-xl border border-white/70 bg-white/70 p-4 backdrop-blur'>
-                  <img src={dummy_profile} alt='Profile preview' className='h-24 w-24 rounded-xl border border-indigo-100 object-cover shadow-sm' />
+                  {lastProfileImage ? (
+                    <img src={lastProfileImage} alt='Latest profile' className='h-24 w-24 rounded-xl border border-indigo-100 object-cover shadow-sm' />
+                  ) : (
+                    <div className='flex h-24 w-24 items-center justify-center rounded-xl border border-indigo-100 bg-white shadow-sm'>
+                      <UserIcon className='size-10 text-indigo-300' />
+                    </div>
+                  )}
 
                   <div className='mt-3 grid grid-cols-2 gap-3 text-sm'>
                     <div className='rounded-lg bg-indigo-50 p-3'>
@@ -211,49 +286,47 @@ const Dashboard = () => {
                   required
                 />
                 <div>
-                  <label htmlFor="resume-input" className='mb-2 block text-sm text-slate-600'>Select a resume file
-                  <div className='group my-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-indigo-200 bg-indigo-50/50 p-4 py-10 text-slate-500 transition-colors hover:border-indigo-500 hover:text-indigo-600'>
+                  <label htmlFor='resume-input' className='mb-2 block text-sm text-slate-600'>Select a resume file</label>
+                  <label htmlFor='resume-input' className='group my-4 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed border-indigo-200 bg-indigo-50/50 p-4 py-10 text-slate-500 transition-colors hover:border-indigo-500 hover:text-indigo-600'>
                     {resume ? (
                       <p className='text-indigo-600'>{resume.name}</p>
-                    ):(
+                    ) : (
                       <>
                         <UploadCloudIcon className='size-14 stroke-1'/>
-                        <p>
-                      <XIcon className='absolute right-4 top-4 size-6 cursor-pointer text-slate-400 transition-colors hover:text-slate-700' onClick={() => { setShowUploadResume(false); setResume(null); setTitle('')}}/>
-                        </p>
-                      </>  
-                      )}                      
-                  </div>
+                        <p>Click to choose a file</p>
+                      </>
+                    )}
                   </label>
-                  <input id='resume-input' type="file" accept=".pdf,.doc,.docx" className='hidden' onChange={(e)=>setResume(e.target.files[0])} required/>
+                  <input id='resume-input' type='file' accept='.pdf,.doc,.docx' className='hidden' onChange={(e)=>setResume(e.target.files[0])} required/>
                 </div>
 
-                <button className='w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700'>Upload</button>
+                <button disabled={isLoading} className='flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-indigo-400'>
+                  {isLoading && <LoaderCircleIcon className='size-5 animate-spin text-white'/>}
+                  {isLoading ? 'Uploading...' : 'Upload Resume'}
+                </button>
 
-                <XIcon className='absolute right-4 top-4 size-6 cursor-pointer text-slate-400 transition-colors hover:text-slate-700' onClick={() => { setShowUploadResume(false); setTitle('')}}/>
-                </div>
-            </form>)
-          }
+                <XIcon className='absolute right-4 top-4 size-6 cursor-pointer text-slate-400 transition-colors hover:text-slate-700' onClick={() => { setShowUploadResume(false); setResume(null); setTitle('')}}/>
+              </div>
+            </form>
+          )}
 
           {editResumeId && (
-          <form onSubmit={editTitle} onClick={()=>setEditResumeId ('')} className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10'>
-            <div onClick={e => e.stopPropagation()} className='relative w-full max-w-sm rounded-xl border border-indigo-200 bg-linear-to-b from-white to-indigo-50 p-6 text-slate-800 shadow-2xl'>
-              <h2 className='mb-4 text-2xl font-bold text-slate-900'>Edit Resume Title</h2>
-              <input onChange={(e)=>setTitle(e.target.value)} 
-                value={title} type="text" placeholder='Enter resume title' className='mb-4 w-full rounded-lg border border-indigo-200 bg-white px-4 py-2 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300' required />
-              <button className='w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700'>Update</button>
+            <form onSubmit={editTitle} onClick={()=>setEditResumeId('')} className='fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-10'>
+              <div onClick={e => e.stopPropagation()} className='relative w-full max-w-sm rounded-xl border border-indigo-200 bg-linear-to-b from-white to-indigo-50 p-6 text-slate-800 shadow-2xl'>
+                <h2 className='mb-4 text-2xl font-bold text-slate-900'>Edit Resume Title</h2>
+                <input onChange={(e)=>setTitle(e.target.value)}
+                  value={title} type='text' placeholder='Enter resume title' className='mb-4 w-full rounded-lg border border-indigo-200 bg-white px-4 py-2 text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300' required />
+                <button className='w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition-colors hover:bg-indigo-700'>Update</button>
 
-              <XIcon className='absolute right-4 top-4 size-6 cursor-pointer text-slate-400 transition-colors hover:text-slate-700' onClick={() => { setEditResumeId(''); setTitle('')}}/>
-            </div>
-          </form>)
-          }
-
+                <XIcon className='absolute right-4 top-4 size-6 cursor-pointer text-slate-400 transition-colors hover:text-slate-700' onClick={() => { setEditResumeId(''); setTitle('')}}/>
+              </div>
+            </form>
+          )}
         </div>
       </div>
-
       <DashboardFooter/>
     </div>
   )
 }
 
-export default Dashboard
+export default Dashboard;

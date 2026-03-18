@@ -1,6 +1,9 @@
 import {Link} from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const CallToAction = () => {
+    const { user } = useSelector((state) => state.auth)
+
   return (
     <div className="bg-black py-16">
         <style>{`
@@ -20,8 +23,8 @@ const CallToAction = () => {
                     Build a professional, ATS-friendly resume in minutes and stand out to recruiters.
                 </p>
             </div>
-            <Link to="#"><button className="px-12 py-3 text-slate-800 font-medium hover:bg-slate-200 transition bg-white rounded-full text-sm mt-4">
-                Create My Resume
+            <Link to={user ? '/app' : '/app?state=login'}><button className="px-12 py-3 text-slate-800 font-medium hover:bg-slate-200 transition bg-white rounded-full text-sm mt-4">
+                {user ? 'Go to Dashboard' : 'Login to Create Resume'}
             </button></Link>
         </div>
     </div>

@@ -1,5 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { login } from '../app/features/authSlice'
+import api from '../configs/api'
+import { toast } from 'react-hot-toast'
 
 const Login = () => {
     const query = new URLSearchParams(window.location.search)
@@ -11,10 +15,24 @@ const Login = () => {
         email: '',
         password: ''
     })
+    const [showPassword, setShowPassword] = useState(false)
+
+    const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        // Future backend logic goes here
+        try {
+            const endpoint = state === 'login' ? 'login' : 'register';
+            const {data} = await api.post(`/api/users/${endpoint}`, formData)
+            console.log("Login successful:", data)
+            dispatch(login({user: data.user, token: data.token}))
+            localStorage.setItem('token', data.token);
+            toast.success(data.message)
+        } catch (error) {
+            console.error("Error submitting form:", error)
+            toast.error(error.response?.data?.message || error.message);
+        }
+
         console.log("Submitting:", state, formData)
     }
 
@@ -103,7 +121,7 @@ const Login = () => {
                                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
-                            <input onChange={handleChange} value={formData.name} name="name" type="text" placeholder="Full name" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none text-sm w-full h-full" required />                 
+                            <input onChange={handleChange} value={formData.name} name="name" type="text" placeholder="Full name" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required />                 
                         </div>
                     )}
         
@@ -111,14 +129,32 @@ const Login = () => {
                         <svg width="16" height="11" viewBox="0 0 16 11" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fillRule="evenodd" clipRule="evenodd" d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z" fill="#9CA3AF"/>
                         </svg>
-                        <input onChange={handleChange} value={formData.email} name="email" type="email" placeholder="Email id" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none text-sm w-full h-full" required />                 
+                        <input onChange={handleChange} value={formData.email} name="email" type="email" placeholder="Email id" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full" required />                 
                     </div>
         
-                    <div className="flex items-center mt-5 w-full bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3">
+                    <div className="flex items-center mt-5 w-full bg-black/40 border border-white/10 hover:border-white/30 focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all h-12 rounded-full overflow-hidden pl-5 pr-2 gap-3 relative">
                         <svg width="13" height="17" viewBox="0 0 13 17" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z" fill="#9CA3AF"/>
                         </svg>
-                        <input onChange={handleChange} value={formData.password} name="password" type="password" placeholder="Password" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none text-sm w-full h-full" required />
+                        <input onChange={handleChange} value={formData.password} name="password" type={showPassword ? "text" : "password"} placeholder="Password" className="bg-transparent text-slate-200 placeholder-slate-500 outline-none border-none focus:ring-0 text-sm w-full h-full pr-10" required />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 text-slate-400 hover:text-white transition-colors flex items-center justify-center p-1"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            ) : (
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            )}
+                        </button>
                     </div>
         
                     {state === "login" && (

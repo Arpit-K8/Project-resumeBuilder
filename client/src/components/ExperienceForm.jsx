@@ -1,7 +1,13 @@
-import { Briefcase, Sparkle, Plus,Trash2 } from 'lucide-react';
+import { Briefcase, Sparkle, Plus,Trash2, Loader2 } from 'lucide-react';
 import React from 'react'
+import { useSelector } from 'react-redux';
+import api from '../configs/api.js';
+import toast from 'react-hot-toast';
 
 const ExperienceForm = ({data, onChange}) => {
+
+    const {token} = useSelector(state => state.auth);
+    const [generatingIndex, setGeneratingIndex] = React.useState(-1);
 
     const addExperience = () => {
         const newExperience = {
@@ -26,6 +32,67 @@ const ExperienceForm = ({data, onChange}) => {
         updated[index] = { ...updated[index], [field]: value };
         onChange(updated);
     }
+
+    const normalizeMonthInput = (value) => {
+        if (!value || typeof value !== 'string') return '';
+
+        const trimmed = value.trim();
+        const isoMonth = /^\d{4,}-\d{2}$/;
+        if (isoMonth.test(trimmed)) {
+            const month = Number(trimmed.split('-')[1]);
+            return month >= 1 && month <= 12 ? trimmed : '';
+        }
+
+        const cleaned = trimmed
+            .replace(/â|’|'|,/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        const parts = cleaned.split(' ');
+        if (parts.length >= 2) {
+            const monthToken = parts[0].toLowerCase().slice(0, 3);
+            const yearToken = parts.find((p) => /^\d{4}$/.test(p));
+            const monthMap = {
+                jan: '01',
+                feb: '02',
+                mar: '03',
+                apr: '04',
+                may: '05',
+                jun: '06',
+                jul: '07',
+                aug: '08',
+                sep: '09',
+                oct: '10',
+                nov: '11',
+                dec: '12'
+            };
+
+            if (yearToken && monthMap[monthToken]) {
+                return `${yearToken}-${monthMap[monthToken]}`;
+            }
+        }
+
+        return '';
+    };
+
+    const generateDescription = async (index) => {
+        setGeneratingIndex(index);
+        const experience = data[index];
+        const prompt = `enhance the description for this experience: ${experience.position} at ${experience.company}`;
+        try {
+            const response = await api.post('/api/ai/enhance-job-desc', {userContent: prompt}, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            updateExperience(index, 'description', response?.data?.enhancedJobDesc || '');
+        } catch (error) {
+            console.error('Error generating description:', error);
+            toast.error(error.response?.data?.message || error.message || "Failed to generate description");
+        } finally {
+            setGeneratingIndex(-1);
+        }
+    };
 
     return (
     <div className='space-y-6'>
@@ -69,14 +136,14 @@ const ExperienceForm = ({data, onChange}) => {
                             onChange={(e) => updateExperience(index, 'position', e.target.value)} 
                             className='px-3 py-2 text-sm rounded-lg'/>
 
-                            <input type="month" placeholder="Start Date" value={experience.start_date || ""} 
+                            <input type="month" placeholder="Start Date" value={normalizeMonthInput(experience.start_date)} 
                             onChange={(e) => updateExperience(index, 'start_date', e.target.value)} 
                             className='px-3 py-2 text-sm rounded-lg'/>
 
                             <input type="month" 
                             placeholder="End Date" 
-                            value={experience.end_date || ""} 
-                            onChange={(e) => updateExperience(index, 'end_date ', e.target.value)} 
+                            value={normalizeMonthInput(experience.end_date)} 
+                            onChange={(e) => updateExperience(index, 'end_date', e.target.value)} 
                             className='px-3 py-2 text-sm rounded-lg'
                             disabled={experience.is_current}/>
                         </div>
@@ -85,7 +152,10 @@ const ExperienceForm = ({data, onChange}) => {
                             name="is_current" 
                             id={`is_current_${index}`} 
                             checked={experience.is_current || false} 
-                            onChange={(e) => updateExperience(index, 'is_current', e.target.checked ? true : false)} 
+                            onChange={(e) => {
+                                updateExperience(index, 'is_current', e.target.checked);
+                                if (e.target.checked) updateExperience(index, 'end_date', '');
+                            }} 
                             className='w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-500'/>    
                             <span className="text-sm text-gray-700">
                                 I currently work here
@@ -96,8 +166,13 @@ const ExperienceForm = ({data, onChange}) => {
                                 <label className='text-sm text-gray-700 font-medium'>
                                    Job Description 
                                 </label>
-                                <button className='flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-10 transition-colors disabled:opacity-50'>
-                                    <Sparkle className='w-3 h-3'/> Enhance with AI
+                                <button 
+                                onClick={() => generateDescription(index)}
+                                disabled={generatingIndex === index || !experience.position || !experience.company}
+                                className='flex items-center gap-1 px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded hover:bg-purple-10 transition-colors disabled:opacity-50'>
+                                        {generatingIndex === index ? (<Loader2 className='w-3 h-3 animate-spin'/> ) : (
+                                    <Sparkle className='w-3 h-3'/> )}
+                                    Enhance with AI
                                 </button>
                             </div>
                             <textarea

@@ -113,7 +113,7 @@ const CreativeTemplate = ({ data, accentColor }) => {
                 )}
 
                 {/* Projects */}
-                {data.project && data.project.length > 0 && (
+                {data.projects && data.projects.length > 0 && (
                     <section className="mb-8">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-1 h-6" style={{ backgroundColor: accentColor }}></div>
@@ -121,10 +121,19 @@ const CreativeTemplate = ({ data, accentColor }) => {
                         </div>
 
                         <div className="grid sm:grid-cols-1 gap-4">
-                            {data.project.map((proj, index) => (
+                            {data.projects.map((proj, index) => (
                                 <div key={index} className="bg-gray-800 border-l-4 p-4 rounded-lg hover:bg-gray-750 transition" style={{ borderLeftColor: accentColor }}>
                                     <h3 className="text-lg font-bold mb-1">{proj.name}</h3>
-                                    <p className="text-gray-400 text-sm mb-2">{proj.type}</p>
+                                    {proj.type && <p className="text-gray-400 text-sm mb-1">{proj.type}</p>}
+                                    {(proj.end_date || proj.is_current) && (
+                                        <p className="text-xs text-gray-500 mb-1">{proj.is_current ? "Present" : formatDate(proj.end_date)}</p>
+                                    )}
+                                    {proj.tech_stack && <p className="text-gray-400 text-sm mb-1">Tech: {proj.tech_stack}</p>}
+                                    {proj.project_link && (
+                                        <a href={proj.project_link} target="_blank" rel="noreferrer" className="text-sm underline mb-2 inline-block" style={{ color: accentColor }}>
+                                            Repo Link
+                                        </a>
+                                    )}
                                     {proj.description && (
                                         <p className="text-gray-400 text-sm leading-relaxed">
                                             {proj.description}
@@ -155,7 +164,7 @@ const CreativeTemplate = ({ data, accentColor }) => {
                                         <p className="text-gray-300 text-sm">{edu.institution}</p>
                                         <div className="flex justify-between items-center">
                                             <span className="text-xs text-gray-500">
-                                                {formatDate(edu.graduation_date)}
+                                                {edu.is_current ? "Present" : formatDate(edu.graduation_date)}
                                             </span>
                                             {edu.gpa && <span className="text-xs text-gray-500">GPA: {edu.gpa}</span>}
                                         </div>

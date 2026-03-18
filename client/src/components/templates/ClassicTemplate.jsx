@@ -93,17 +93,29 @@ const ClassicTemplate = ({ data, accentColor }) => {
             )}
 
             {/* Projects */}
-            {data.project && data.project.length > 0 && (
+            {data.projects && data.projects.length > 0 && (
                 <section className="mb-6">
                     <h2 className="text-xl font-semibold mb-4" style={{ color: accentColor }}>
                         PROJECTS
                     </h2>
 
                     <ul className="space-y-3 ">
-                        {data.project.map((proj, index) => (
+                        {data.projects.map((proj, index) => (
                             <div key={index} className="flex justify-between items-start border-l-3 border-gray-300 pl-6">
                                 <div>
                                     <li className="font-semibold text-gray-800 ">{proj.name}</li>
+                                    {proj.type && (
+                                        <p className="text-sm" style={{ color: accentColor }}>{proj.type}</p>
+                                    )}
+                                    {(proj.end_date || proj.is_current) && (
+                                        <p className="text-xs text-gray-500">{proj.is_current ? "Present" : formatDate(proj.end_date)}</p>
+                                    )}
+                                    {proj.tech_stack && <p className="text-sm text-gray-600">Tech: {proj.tech_stack}</p>}
+                                    {proj.project_link && (
+                                        <a href={proj.project_link} target="_blank" rel="noreferrer" className="text-sm underline" style={{ color: accentColor }}>
+                                            Repo Link
+                                        </a>
+                                    )}
                                     <p className="text-gray-600">{proj.description}</p>
                                 </div>
                             </div>
@@ -130,7 +142,7 @@ const ClassicTemplate = ({ data, accentColor }) => {
                                     {edu.gpa && <p className="text-sm text-gray-600">GPA: {edu.gpa}</p>}
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    <p>{formatDate(edu.graduation_date)}</p>
+                                    <p>{edu.is_current ? "Present" : formatDate(edu.graduation_date)}</p>
                                 </div>
                             </div>
                         ))}

@@ -95,20 +95,30 @@ const ModernTemplate = ({ data, accentColor }) => {
 				)}
 
 				{/* Projects */}
-				{data.project && data.project.length > 0 && (
+				{data.projects && data.projects.length > 0 && (
 					<section className="mb-8">
 						<h2 className="text-2xl font-light mb-4 pb-2 border-b border-gray-200">
 							Projects
 						</h2>
 
 						<div className="space-y-6">
-							{data.project.map((p, index) => (
+							{data.projects.map((p, index) => (
 								<div key={index} className="relative pl-6 border-l border-gray-200" style={{borderLeftColor: accentColor}}>
 
 
 									<div className="flex justify-between items-start">
 										<div>
 											<h3 className="text-lg font-medium text-gray-900">{p.name}</h3>
+											{p.type && <p className="text-sm" style={{ color: accentColor }}>{p.type}</p>}
+											{(p.end_date || p.is_current) && (
+												<p className="text-xs text-gray-500 mt-1">{p.is_current ? "Present" : formatDate(p.end_date)}</p>
+											)}
+											{p.tech_stack && <p className="text-sm text-gray-600 mt-1">Tech: {p.tech_stack}</p>}
+											{p.project_link && (
+												<a href={p.project_link} target="_blank" rel="noreferrer" className="text-sm underline mt-1 inline-block" style={{ color: accentColor }}>
+													Repo Link
+												</a>
+											)}
 										</div>
 									</div>
 									{p.description && (
@@ -138,7 +148,7 @@ const ModernTemplate = ({ data, accentColor }) => {
 										</h3>
 										<p style={{ color: accentColor }}>{edu.institution}</p>
 										<div className="flex justify-between items-center text-sm text-gray-600">
-											<span>{formatDate(edu.graduation_date)}</span>
+											<span>{edu.is_current ? "Present" : formatDate(edu.graduation_date)}</span>
 											{edu.gpa && <span>GPA: {edu.gpa}</span>}
 										</div>
 									</div>

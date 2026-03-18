@@ -2,11 +2,28 @@ import React from 'react'
 import { Trash2, Plus } from 'lucide-react';
 
 const ProjectForm = ({data = [], onChange}) => {
+
+    const normalizeMonthInput = (value) => {
+        if (!value || typeof value !== 'string') return '';
+
+        const trimmed = value.trim();
+        const isoMonth = /^\d{4,}-\d{2}$/;
+        if (isoMonth.test(trimmed)) {
+            const month = Number(trimmed.split('-')[1]);
+            return month >= 1 && month <= 12 ? trimmed : '';
+        }
+
+        return '';
+    };
   
     const addProject = () => {
         const newProject = {
             name: "",
             type: "",
+            tech_stack: "",
+            project_link: "",
+            end_date: "",
+            is_current: false,
             description: "",
         };
         onChange([...data, newProject]);
@@ -59,6 +76,40 @@ const ProjectForm = ({data = [], onChange}) => {
                             value={project.type || ""} 
                             onChange={(e) => updateProject(index, 'type', e.target.value)} 
                             className='px-3 py-2 text-sm rounded-lg'/>
+
+                            <input type="text" placeholder="Tech Stack (e.g. React, Node.js, MongoDB)" 
+                            value={project.tech_stack || ""} 
+                            onChange={(e) => updateProject(index, 'tech_stack', e.target.value)} 
+                            className='px-3 py-2 text-sm rounded-lg'/>
+
+                            <input type="url" placeholder="Project Website Link" 
+                            value={project.project_link || ""} 
+                            onChange={(e) => updateProject(index, 'project_link', e.target.value)} 
+                            className='px-3 py-2 text-sm rounded-lg'/>
+
+                            <input type="month" placeholder="End Date" 
+                            value={normalizeMonthInput(project.end_date)} 
+                            onChange={(e) => updateProject(index, 'end_date', e.target.value)} 
+                            className='px-3 py-2 text-sm rounded-lg'
+                            disabled={project.is_current}/>
+
+                            <label className='flex items-center gap-2'>
+                                <input
+                                    type='checkbox'
+                                    checked={project.is_current || false}
+                                    onChange={(e) => {
+                                        const updated = [...data];
+                                        updated[index] = {
+                                            ...updated[index],
+                                            is_current: e.target.checked,
+                                            end_date: e.target.checked ? '' : (updated[index]?.end_date || '')
+                                        };
+                                        onChange(updated);
+                                    }}
+                                    className='w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-500'
+                                />
+                                <span className='text-sm text-gray-700'>Present Working</span>
+                            </label>
             
                             <textarea 
                                 rows={4}

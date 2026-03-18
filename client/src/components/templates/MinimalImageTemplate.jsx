@@ -57,8 +57,8 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                             )}
                             {data.personal_info?.email && (
                                 <div className="flex items-center gap-2">
-                                    <Mail size={14} style={{ color: accentColor }} />
-                                    <span>{data.personal_info.email}</span>
+                                    <Mail size={14} className="shrink-0" style={{ color: accentColor }} />
+                                    <span className="break-all">{data.personal_info.email}</span>
                                 </div>
                             )}
                             {data.personal_info?.location && (
@@ -82,7 +82,7 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                                         <p className="font-semibold uppercase">{edu.degree}</p>
                                         <p className="text-zinc-600">{edu.institution}</p>
                                         <p className="text-xs text-zinc-500">
-                                            {formatDate(edu.graduation_date)}
+                                            {edu.is_current ? "Present" : formatDate(edu.graduation_date)}
                                         </p>
                                     </div>
                                 ))}
@@ -155,18 +155,33 @@ const MinimalImageTemplate = ({ data, accentColor }) => {
                     )}
 
                     {/* Projects */}
-                    {data.project && data.project.length > 0 && (
+                    {data.projects && data.projects.length > 0 && (
                         <section>
                             <h2 className="text-sm uppercase tracking-widest font-semibold" style={{ color: accentColor }}>
                                 PROJECTS
                             </h2>
                             <div className="space-y-4">
-                                {data.project.map((project, index) => (
+                                {data.projects.map((project, index) => (
                                     <div key={index}>
                                         <h3 className="text-md font-medium text-zinc-800 mt-3">{project.name}</h3>
-                                        <p className="text-sm mb-1" style={{ color: accentColor }} >
-                                            {project.type}
-                                        </p>
+                                        {project.type && (
+                                            <p className="text-sm mb-1" style={{ color: accentColor }} >
+                                                {project.type}
+                                            </p>
+                                        )}
+                                        {(project.end_date || project.is_current) && (
+                                            <p className="text-xs text-zinc-500 mb-1">
+                                                {project.is_current ? "Present" : formatDate(project.end_date)}
+                                            </p>
+                                        )}
+                                        {project.tech_stack && (
+                                            <p className="text-xs text-zinc-600 mb-1">Tech: {project.tech_stack}</p>
+                                        )}
+                                        {project.project_link && (
+                                            <a href={project.project_link} target="_blank" rel="noreferrer" className="text-xs underline mb-1 block" style={{ color: accentColor }}>
+                                                Repo Link
+                                            </a>
+                                        )}
                                         {project.description && (
                                             <ul className="list-disc list-inside text-sm text-zinc-700  space-y-1">
                                                 {project.description.split("\n").map((line, i) => (

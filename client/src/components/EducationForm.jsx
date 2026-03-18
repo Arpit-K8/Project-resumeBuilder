@@ -2,6 +2,19 @@ import React from 'react'
 import { GraduationCap, Plus, Trash2 } from 'lucide-react';
 
 const EducationForm = ({data, onChange}) => {
+
+    const normalizeMonthInput = (value) => {
+        if (!value || typeof value !== 'string') return '';
+
+        const trimmed = value.trim();
+        const isoMonth = /^\d{4,}-\d{2}$/;
+        if (isoMonth.test(trimmed)) {
+            const month = Number(trimmed.split('-')[1]);
+            return month >= 1 && month <= 12 ? trimmed : '';
+        }
+
+        return '';
+    };
   
     const addEducation = () => {
         const newEducation = {
@@ -11,6 +24,7 @@ const EducationForm = ({data, onChange}) => {
             field: "",
             graduation_date: "",
             gpa:"",
+            is_current: false,
         };
         onChange([...data, newEducation]);
     };
@@ -37,7 +51,7 @@ const EducationForm = ({data, onChange}) => {
                     Add details for your educational background here.
                 </p>
             </div>
-            <button className='flex w-full items-center justify-center gap-2 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors shrink-0 sm:mt-1 sm:w-auto' onClick={addEducation}>
+            <button type='button' className='flex w-full items-center justify-center gap-2 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 transition-colors shrink-0 sm:mt-1 sm:w-auto' onClick={addEducation}>
                 <Plus className='size-4'/> Add Education
             </button>
         </div>
@@ -52,7 +66,7 @@ const EducationForm = ({data, onChange}) => {
                     <div key={index} className='border border-gray-300 rounded-lg p-4 space-y-3'>
                         <div className='flex justify-between items-start'>
                             <h4>Education #{index + 1}</h4>
-                            <button className='text-red-500 hover:text-red-700 transition-colors' 
+                            <button type='button' className='text-red-500 hover:text-red-700 transition-colors' 
                             onClick={() => removeEducation(index)}>
                                 <Trash2 className='size-4' />
                             </button>
@@ -73,10 +87,28 @@ const EducationForm = ({data, onChange}) => {
                             onChange={(e) => updateEducation(index, 'field', e.target.value)} 
                             className='px-3 py-2 text-sm rounded-lg'/>
 
-                            <input type="month" placeholder="Graduation Date" value={education.graduation_date || ""} 
+                            <input type="month" placeholder="Graduation Date" value={normalizeMonthInput(education.graduation_date)} 
                             onChange={(e) => updateEducation(index, 'graduation_date', e.target.value)} 
-                            className='px-3 py-2 text-sm rounded-lg'/>
+                            className='px-3 py-2 text-sm rounded-lg'
+                            disabled={education.is_current}/>
                         </div>
+                        <label className='flex items-center gap-2'>
+                            <input
+                                type='checkbox'
+                                checked={education.is_current || false}
+                                onChange={(e) => {
+                                    const updated = [...data];
+                                    updated[index] = {
+                                        ...updated[index],
+                                        is_current: e.target.checked,
+                                        graduation_date: e.target.checked ? '' : (updated[index]?.graduation_date || '')
+                                    };
+                                    onChange(updated);
+                                }}
+                                className='w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-500'
+                            />
+                            <span className='text-sm text-gray-700'>I currently study here</span>
+                        </label>
                         <input type="text" placeholder="GPA (optional)" value={education.gpa || ""} 
                         onChange={(e) => updateEducation(index, 'gpa', e.target.value)} 
                         className='px-3 py-2 text-sm rounded-lg w-24'/>

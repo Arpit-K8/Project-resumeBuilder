@@ -4,6 +4,7 @@ import { dummyResumeData } from '../assets/assets';
 import ResumePreview from '../components/ResumePreview';
 import { ArrowLeftIcon } from 'lucide-react';
 import Loader from '../components/Loader';
+import api from '../configs/api.js';
 
 const Preview = () => {
   const {resumeId} = useParams();
@@ -12,8 +13,15 @@ const Preview = () => {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const loadResume = async() =>{
-    setIsLoading(false);
-    setResumeData(dummyResumeData.find(resume => resume._id === resumeId || null));
+    try {
+      const {data} = await api.get('/api/resumes/public/' + resumeId);
+      setResumeData(data.resume);
+    } catch (error) {
+      console.error('Error loading resume:', error.message || error);
+    }
+    finally{
+      setIsLoading(false); 
+    }
   }
 
   useEffect(()=>{
