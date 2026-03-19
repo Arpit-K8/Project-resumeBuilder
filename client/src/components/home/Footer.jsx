@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import logo from '../../assets/logo.svg'
 
 const Footer = () => {
     return (
@@ -18,7 +19,8 @@ const Footer = () => {
                         
                         <div className="lg:col-span-3 space-y-6">
                             <Link to="/" className="block">
-                                <h2 className="text-2xl font-bold text-white">Resumify</h2>
+                                <img src={logo} alt="Resumify Logo" className="w-60 h-15 mb-[-15px] mr-[25px]"/>
+                                {/* <h2 className="text-2xl font-bold text-white">Resumify</h2> */}
                             </Link>
                             <p className="text-sm/6 text-neutral-300 max-w-96">Create professional, stunning resumes in minutes. Build your perfect resume with our intuitive resume builder and showcase your skills to top employers effortlessly.</p>
                             <div className="flex gap-5 md:gap-6 order-1 md:order-2">
@@ -68,11 +70,11 @@ const Footer = () => {
                             <div>
                                 <h3 className="font-medium text-sm mb-4">Resources</h3>
                                 <ul className="space-y-3 text-sm text-neutral-300">
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Help Center</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Resume Tips</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Examples</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Blog</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">FAQ</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Help Center</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Resume Tips</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Examples</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Blog</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">FAQ</Link></li>
                                 </ul>
                             </div>
 
@@ -81,13 +83,13 @@ const Footer = () => {
                                 <h3 className="font-medium text-sm mb-4">Company</h3>
                                 <ul className="space-y-3 text-sm text-neutral-300">
                                     <li><Link to="/about" className="hover:text-indigo-400 transition">About</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Vision</Link></li>
+                                    <li><Link to="/vision" className="hover:text-indigo-400 transition">Vision</Link></li>
                                     <li className="flex items-center gap-2">
-                                        <Link to="#" className="hover:text-indigo-400 transition">Careers</Link>
+                                        <Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Careers</Link>
                                         <span className="text-[11px] px-2 py-0.5 rounded-full bg-indigo-950 border border-indigo-400 text-indigo-400">HIRING</span>
                                     </li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Privacy policy</Link></li>
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">Contact Us</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Privacy policy</Link></li>
+                                    <li><Link to="/FutureUpdate" className="hover:text-indigo-400 transition">Contact Us</Link></li>
                                 </ul>
                             </div>
                         </div>

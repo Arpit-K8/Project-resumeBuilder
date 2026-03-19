@@ -86,9 +86,16 @@ const About = () => {
             </h1>
 
             <p className="text-slate-300 text-sm md:text-lg max-w-2xl mt-5 leading-relaxed">
-              We’re building a resume experience that’s simple enough for first-time
-              applicants and powerful enough for professionals. No confusing formatting,
-              no “blank page” panic—just a clean flow from draft to ready-to-send PDF.
+              We didn’t start by guessing what recruiters want—we started by listening.
+              After meeting recruiters and hiring teams across different companies, we saw
+              the same pattern: great candidates get skipped because their resumes are hard
+              to scan, poorly structured, or filled with noise.
+              <br />
+              <br />
+              That’s when we decided to build Resumify: a resume builder that keeps your
+              resume clean, ATS-friendly, and easy to read—so your skills and impact come
+              through in seconds. Simple enough for first-time applicants, powerful enough
+              for professionals, and polished enough to send with confidence.
             </p>
 
             <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4 w-full">

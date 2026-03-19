@@ -13,6 +13,8 @@ import api from './configs/api'
 import { useEffect } from 'react'
 import {Toaster} from 'react-hot-toast'
 import About from './pages/About'
+import Vision from './pages/Vision'
+import Future from './pages/Future'
 
 const App = () => {
 
@@ -58,6 +60,8 @@ useEffect(() => {
         {/* <Route path='login' element={<Login />} /> */}
         
         <Route path='/about' element={<About />} />
+        <Route path='/vision' element={<Vision />} />
+        <Route path='/FutureUpdate' element={<Future/>} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </>

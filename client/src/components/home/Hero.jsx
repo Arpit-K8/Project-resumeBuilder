@@ -133,12 +133,12 @@ const Hero = () => {
     <div className="flex items-center gap-2 border border-white/15 rounded-full px-4 py-2 text-xs sm:text-sm mt-16 max-w-[90vw] text-center">
         <p className="hidden sm:block">Explore how we create perfect CVs for placements.</p>
         <p className="sm:hidden">Perfect CVs for placements.</p>
-        <a href="#" className="flex items-center gap-1 font-medium whitespace-nowrap text-indigo-400 hover:text-indigo-300">
+        <Link to="/about" className="flex items-center gap-1 font-medium whitespace-nowrap text-indigo-400 hover:text-indigo-300">
             Read more
             <svg className="mt-0.5" width="16" height="16" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M3.959 9.5h11.083m0 0L9.501 3.96m5.541 5.54-5.541 5.542" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-        </a>
+        </Link>
     </div>
 
     <h1 className="text-4xl sm:text-5xl md:text-6xl text-center font-bold max-w-4xl mt-6 px-4 leading-tight bg-gradient-to-r from-white to-[#748298] text-transparent bg-clip-text">
