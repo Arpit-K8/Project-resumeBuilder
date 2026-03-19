@@ -8,7 +8,11 @@ const TemplateSelector = ({selectedTemplate, onChange}) => {
             {id:"modern", name:"Modern", preview:"Sleek design with strategic use of color and modern font choices. Perfect for creative professionals and those looking to make a bold statement."},
             {id:"minimal", name:"Minimal", preview:"Minimal desgin with a single image and clean typography. Great for job seekers in creative fields or those with limited experience who want to highlight their skills and potential."},
             {id:"minimal-image", name:"Minimal with Image", preview:"Ultra-clean desgin that puts your content front and center. Ideal for job seekers in creative fields or those with limited experience who want to highlight their skills and potential."},
-            {id:"creative", name:"Creative", preview:"A visually striking design with bold colors, unique layouts, and creative use of typography. Best for professionals in creative industries looking to showcase their personality and stand out."}
+            {id:"creative", name:"Creative", preview:"A visually striking design with bold colors, unique layouts, and creative use of typography. Best for professionals in creative industries looking to showcase their personality and stand out."},
+            {id:"executive", name:"Executive", preview:"Professional two-column layout with sidebar design. Features contact info and skills prominently. Perfect for executives and managers seeking a polished, corporate presentation."},
+            {id:"academic", name:"Academic", preview:"Formal serif-based design emphasizing education and research. Ideal for academics, educators, and professionals seeking a scholarly, traditional presentation."},
+            {id:"compact", name:"Compact", preview:"Space-efficient three-column layout that maximizes information density. Great for job seekers wanting to fit more content on one page."},
+            {id:"timeline", name:"Timeline", preview:"Creative timeline visualization of career progression. Perfect for showcasing journey and growth through alternating left-right experience blocks."}
         ]
     return (
     <div className='relative'>

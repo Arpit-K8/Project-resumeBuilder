@@ -80,7 +80,7 @@ const Footer = () => {
                             <div className="col-span-2 md:col-span-1">
                                 <h3 className="font-medium text-sm mb-4">Company</h3>
                                 <ul className="space-y-3 text-sm text-neutral-300">
-                                    <li><Link to="#" className="hover:text-indigo-400 transition">About</Link></li>
+                                    <li><Link to="/about" className="hover:text-indigo-400 transition">About</Link></li>
                                     <li><Link to="#" className="hover:text-indigo-400 transition">Vision</Link></li>
                                     <li className="flex items-center gap-2">
                                         <Link to="#" className="hover:text-indigo-400 transition">Careers</Link>
