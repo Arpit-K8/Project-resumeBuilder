@@ -3,7 +3,7 @@ import logo from "../assets/logo.svg";
 
 const Footer = () => {
   return (
-    <footer className='relative mt-3 overflow-hidden rounded-t-4xl border-t border-indigo-300/30 bg-linear-to-b from-slate-950 via-slate-900 to-[#111a2d]'>
+    <footer className='relative mt-3 w-full self-stretch overflow-hidden rounded-t-4xl border-t border-indigo-300/30 bg-linear-to-b from-slate-950 via-slate-900 to-[#111a2d]'>
       <div className='pointer-events-none absolute -top-20 left-1/2 h-36 w-160 -translate-x-1/2 rounded-full bg-indigo-400/20 blur-3xl' />
       <div className='pointer-events-none absolute -bottom-16 left-1/2 h-36 w-md -translate-x-1/2 rounded-full bg-sky-300/20 blur-3xl' />
 
