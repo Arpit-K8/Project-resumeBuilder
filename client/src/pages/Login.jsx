@@ -145,14 +145,7 @@ const Login = () => {
       localStorage.setItem('token', data.token)
       toast.success(data.message)
     } catch (err) {
-      const status = err.response?.status
-      const serverMessage = err.response?.data?.message
-      console.error('Auth request failed', {
-        endpoint,
-        status,
-        message: serverMessage || err.message
-      })
-      toast.error(serverMessage || (status ? `Request failed (${status})` : err.message))
+      toast.error(err.response?.data?.message || err.message)
     } finally {
       setIsSubmitting(false)
     }
