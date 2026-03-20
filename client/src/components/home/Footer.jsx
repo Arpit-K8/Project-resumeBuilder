@@ -20,7 +20,6 @@ const Footer = () => {
                         <div className="lg:col-span-3 space-y-6">
                             <Link to="/" className="block">
                                 <img src={logo} alt="Resumify Logo" className="w-60 h-15 mb-[-15px] mr-[25px]"/>
-                                {/* <h2 className="text-2xl font-bold text-white">Resumify</h2> */}
                             </Link>
                             <p className="text-sm/6 text-neutral-300 max-w-96">Create professional, stunning resumes in minutes. Build your perfect resume with our intuitive resume builder and showcase your skills to top employers effortlessly.</p>
                             <div className="flex gap-5 md:gap-6 order-1 md:order-2">
