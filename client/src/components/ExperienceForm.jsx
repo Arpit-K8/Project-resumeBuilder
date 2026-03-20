@@ -33,6 +33,16 @@ const ExperienceForm = ({data, onChange}) => {
         onChange(updated);
     }
 
+    const toggleCurrentExperience = (index, checked) => {
+        const updated = [...data];
+        updated[index] = {
+            ...updated[index],
+            is_current: checked,
+            end_date: checked ? '' : (updated[index]?.end_date || '')
+        };
+        onChange(updated);
+    }
+
     const normalizeMonthInput = (value) => {
         if (!value || typeof value !== 'string') return '';
 
@@ -152,10 +162,7 @@ const ExperienceForm = ({data, onChange}) => {
                             name="is_current" 
                             id={`is_current_${index}`} 
                             checked={experience.is_current || false} 
-                            onChange={(e) => {
-                                updateExperience(index, 'is_current', e.target.checked);
-                                if (e.target.checked) updateExperience(index, 'end_date', '');
-                            }} 
+                            onChange={(e) => toggleCurrentExperience(index, e.target.checked)} 
                             className='w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-500'/>    
                             <span className="text-sm text-gray-700">
                                 I currently work here
