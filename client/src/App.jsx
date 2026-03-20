@@ -8,7 +8,7 @@ import Preview from './pages/Preview'
 // import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 import { useDispatch } from 'react-redux'
-import { login, setLoading } from './app/features/authSlice'
+import { login, logout, setLoading } from './app/features/authSlice'
 import api from './configs/api'
 import { useEffect } from 'react'
 import {Toaster} from 'react-hot-toast'
@@ -36,6 +36,9 @@ const App = () => {
         dispatch(setLoading(false))
       }
     } catch (error) {
+      if (error.response?.status === 401) {
+        dispatch(logout())
+      }
       dispatch(setLoading(false))
       console.log(error.message)
     }
