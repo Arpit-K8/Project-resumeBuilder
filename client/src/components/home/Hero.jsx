@@ -154,7 +154,7 @@ const Hero = () => {
                 Get Started
             </button>
         </Link>
-        <Link to="#" className="w-full sm:w-auto">
+        <Link to="/about" className="w-full sm:w-auto">
             <button className="w-full sm:w-auto flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/15 rounded-full px-8 py-3.5 transition">
                 <span>Learn More</span>
                 <svg className="mt-0.5" width="6" height="8" viewBox="0 0 6 8" fill="none" xmlns="http://www.w3.org/2000/svg">

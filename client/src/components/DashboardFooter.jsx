@@ -18,8 +18,8 @@ const Footer = () => {
         </p>
 
         <nav className='flex items-center gap-6 text-sm text-slate-300/80'>
-          <a href='#' className='transition-colors hover:text-white'>Terms &amp; Conditions</a>
-          <a href='#' className='transition-colors hover:text-white'>Privacy Policy</a>
+          <a href='/FutureUpdate' className='transition-colors hover:text-white'>Terms &amp; Conditions</a>
+          <a href='/FutureUpdate' className='transition-colors hover:text-white'>Privacy Policy</a>
         </nav>
       </div>
     </footer>
