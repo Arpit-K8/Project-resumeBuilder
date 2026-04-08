@@ -25,27 +25,27 @@ export const registerUser = async (req, res) => {
 
     // Validate input
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Missing required fields' });
+      return res.status(400).json({ message: 'Missing required fields: name, email, and password are required' });
     }
 
     if (!NAME_REGEX.test(name) || name.length < 2 || name.length > 50) {
-      return res.status(400).json({ message: 'Name must be 2-50 characters and contain letters only' });
+      return res.status(400).json({ message: 'Name must be 2-50 characters and contain letters only (no numbers or special chars)' });
     }
 
     if (!EMAIL_REGEX.test(email) || email.length > 254) {
-      return res.status(400).json({ message: 'Please enter a valid email address' });
+      return res.status(400).json({ message: 'Please enter a valid email address (e.g., user@example.com)' });
     }
 
     if (!PASSWORD_REGEX.test(password)) {
       return res.status(400).json({
-        message: 'Password must be 8-64 chars with uppercase, lowercase, number, and special character'
+        message: 'Password must be 8-64 characters with at least one uppercase letter, one lowercase letter, one number, and one special character'
       });
     }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.status(400).json({ message: 'User already exists with this email' });
         }
 
     // Create new user
@@ -66,7 +66,8 @@ export const registerUser = async (req, res) => {
 
     }catch (error) {
     console.error('Error registering user:', error);
-      return res.status(400).json({message: error.message});
+      const status = /buffering timed out|mongo|database|connect/i.test(error?.message || '') ? 503 : 500;
+      return res.status(status).json({message: error.message || 'Registration failed'});
     }
 }
 
@@ -111,7 +112,8 @@ export const loginUser = async (req, res) => {
 
   } catch (error) {
     console.error('Error logging in user:', error);
-    return res.status(400).json({ message: error.message });
+    const status = /buffering timed out|mongo|database|connect/i.test(error?.message || '') ? 503 : 500;
+    return res.status(status).json({ message: error.message || 'Login failed' });
   }
 };
 
@@ -130,7 +132,8 @@ export const getUserById = async (req, res) => {
         return res.status(200).json({ user });
     } catch (error) {
         console.error('Error fetching user data:', error);
-        return res.status(400).json({ message: error.message });
+      const status = /buffering timed out|mongo|database|connect/i.test(error?.message || '') ? 503 : 500;
+      return res.status(status).json({ message: error.message || 'Failed to fetch user data' });
     }
 }
 
@@ -145,6 +148,7 @@ export const getUserResumes = async (req, res) => {
         return res.status(200).json({ resumes });
     } catch (error) {
         console.error('Error fetching user resumes:', error);
-        return res.status(400).json({ message: error.message });
+      const status = /buffering timed out|mongo|database|connect/i.test(error?.message || '') ? 503 : 500;
+      return res.status(status).json({ message: error.message || 'Failed to fetch resumes' });
     }
 }

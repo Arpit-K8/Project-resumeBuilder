@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
+    // Fail fast when DB is unavailable instead of buffering operations for 10s.
+    mongoose.set('bufferCommands', false);
+
     mongoose.connection.on("connected", () => {
       console.log("Mongoose connected to DB");
     });
@@ -28,6 +31,7 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
+    throw error;
   }
 };
 
