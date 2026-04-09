@@ -47,6 +47,15 @@ app.get('/', (req, res) => {
   res.send('Server is running...');
 });
 
+// to keep it alive in production environments (cause of free hosting limitations)
+app.get('/healthz', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: 'resume-builder-api',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.use('/api/users', userRouter );
 app.use('/api/resumes', resumeRouter);
 app.use('/api/ai', aiRouter);
