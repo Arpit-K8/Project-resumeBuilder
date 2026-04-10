@@ -49,11 +49,7 @@ app.get('/', (req, res) => {
 
 // to keep it alive in production environments (cause of free hosting limitations)
 app.get('/healthz', (req, res) => {
-  res.status(200).json({
-    ok: true,
-    service: 'resume-builder-api',
-    timestamp: new Date().toISOString()
-  });
+  res.status(200).send('ok');
 });
 
 app.use('/api/users', userRouter );
