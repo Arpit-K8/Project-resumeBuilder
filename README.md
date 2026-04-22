@@ -2,6 +2,10 @@
 
 A full-stack modern Resume Builder web application built with the MERN stack (MongoDB, Express, React, Node.js). The application leverages artificial intelligence using OpenAI to help users craft professional resumes automatically, and uses ImageKit for efficient image management.
 
+## Live Deployment
+
+- Deployed on Render: https://resumify-professional.onrender.com/
+
 ## Tech Stack
 
 ### Frontend (Client)
