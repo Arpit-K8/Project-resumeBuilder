@@ -22,6 +22,10 @@ import aiRouter from './routes/aiRoutes.js';
 dotenv.config({ override: true });
 
 const app = express();
+
+// Trust the reverse proxy (e.g., Render, Heroku, Nginx) so rate limiting uses the correct IP
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 3000;
 
 // Middleware
