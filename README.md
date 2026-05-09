@@ -27,6 +27,7 @@ A full-stack modern Resume Builder web application built with the MERN stack (Mo
 - **User Authentication:** Secure signup and login functionality.
 - **AI-Powered Generation:** Integrate OpenAI to draft and refine professional resume summaries, experience bullet points, etc.
 - **Image Management:** Seamlessly upload and manage profile pictures via ImageKit.
+- **API Rate Limiting:** Built-in rate limiting using `express-rate-limit` for OpenAI and ImageKit endpoints to prevent abuse and manage API quotas.
 - **PDF Parsing:** Capable of reading initial resume data using `react-pdftotext`.
 - **Responsive Design:** Clean, modern, and mobile-friendly UI built with Tailwind CSS.
 
